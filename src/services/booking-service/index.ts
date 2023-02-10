@@ -1,25 +1,24 @@
 import bookingRepository from '@/repositories/booking-repository';
 import { notFoundError } from '@/errors';
 
-async function findBooking(userId:number) {
+async function findBooking(userId: number) {
   const result = await bookingRepository.findBooking(userId);
   if (!result) throw notFoundError();
   return result;
 }
- 
-async function createBooking(userId:number, roomId:number) {
 
+async function createBooking(userId: number, roomId: number) {
   const consult = await bookingRepository.consultRoom(roomId);
-
-  if (!consult || consult[0].Booking.length === consult[0].capacity) throw notFoundError(); 
+   
+  if (consult.length === 0 || consult[0].Booking.length === consult[0].capacity) throw notFoundError();
 
   const result = await bookingRepository.createBooking(userId, roomId);
-  return result;   
+  return result;
 }
 
 const bookingService = {
   findBooking,
-  createBooking
+  createBooking,
 };
 
 export default bookingService;
