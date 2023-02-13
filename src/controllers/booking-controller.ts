@@ -29,6 +29,29 @@ export async function createBooking(req: AuthenticatedRequest, res: Response) {
     if (error.name === 'NotFoundError') {
       return res.sendStatus(httpStatus.NOT_FOUND);
     }
+    if (error.name === 'UnauthorizedError') {
+      return res.sendStatus(403);
+    }
+    return res.sendStatus(httpStatus.BAD_REQUEST);
+  }
+}
+export async function updateBooking(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { roomId } = req.body;
+  const { bookingId } = req.params;
+  if (!roomId) return res.sendStatus(403);
+
+  try {
+    const result = await bookingService.updateBooking(Number(bookingId), userId, roomId);
+    
+    return res.status(httpStatus.OK).send(result);
+  } catch (error) {
+    if (error.name === 'NotFoundError') {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    if (error.name === 'UnauthorizedError') {
+      return res.sendStatus(403);
+    }
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
