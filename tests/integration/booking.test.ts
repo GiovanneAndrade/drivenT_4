@@ -253,15 +253,15 @@ describe('POST /booking', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({ roomId: roomId.id });
         const updateBookingUser = await updateBooking(createBookingUser.id, user.id, updateRoomId.id);
-        const consult = await prisma.booking.findFirst({
-          where: {
-            roomId: updateRoomId.id,
-          },
-        });
+        const consult = await prisma.booking.findFirst({ });
 
         expect(consult.roomId).toBe(updateRoomId.id);
         expect(consult.userId).toBe(user.id);
         expect(response.status).toBe(httpStatus.OK);
+        expect(response.body).toMatchObject({
+          userId: createBookingUser.userId,
+          roomId: createBookingUser.roomId
+        });
       });
     });
   });
