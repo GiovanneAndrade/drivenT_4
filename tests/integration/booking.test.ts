@@ -167,7 +167,7 @@ describe('POST /booking', () => {
         const enrollment = await createEnrollment(user.id);
         const ticketType = await createTicketTypeRemote();
         const ticket = await createTicketNew(enrollment.id, ticketType.id);
-        const ticketIsRemote = await createTicketTypeRemoteNew();
+   
         const hotelId = await createHotel();
         const roomId = await createRoom(hotelId.id);
         const response = await server
@@ -189,11 +189,28 @@ describe('POST /booking', () => {
         });
       });
 
-      it('reservation not made unpaid ticket', async () => {
+       it('reservation not made unpaid ticket', async () => {
         const user = await createUser();
         const token = await generateValidToken(user);
         const enrollment = await createEnrollment(user.id);
         const ticketType = await createTicketTypeRemote();
+        const ticket = await createTicketError(enrollment.id, ticketType.id);
+        const ticketIsRemote = await createTicketTypeRemoteNew();
+        const hotelId = await createHotel();
+        const roomId = await createRoom(hotelId.id);
+        const response = await server
+          .post('/booking')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ roomId: roomId.id });
+
+        expect(response.status).toBe(httpStatus.NOT_FOUND);
+     
+      }); 
+      it('ticket is not in person', async () => {
+        const user = await createUser();
+        const token = await generateValidToken(user);
+        const enrollment = await createEnrollment(user.id);
+        const ticketType = await createTicketTypeRemoteNew();
         const ticket = await createTicketError(enrollment.id, ticketType.id);
         const ticketIsRemote = await createTicketTypeRemoteNew();
         const hotelId = await createHotel();
@@ -211,7 +228,7 @@ describe('POST /booking', () => {
   });
 });
 
-describe('POST /booking', () => {
+describe('PUT /booking', () => {
   it('should respond with status 401 if no token is given', async () => {
     const response = await server.put('/booking/:bookingId');
     expect(response.status).toBe(httpStatus.UNAUTHORIZED);

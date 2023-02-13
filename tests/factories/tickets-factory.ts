@@ -28,8 +28,8 @@ export async function createTicketTypeRemoteNew() {
     data: {
       name: faker.name.findName(),
       price: faker.datatype.number(),
-      isRemote: true,
-      includesHotel: true,
+      isRemote: false,
+      includesHotel: faker.datatype.boolean(),
     },
   });
 }
