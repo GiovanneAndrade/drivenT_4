@@ -8,6 +8,11 @@ import * as jwt from 'jsonwebtoken';
 import supertest from 'supertest';
 import {
   createEnrollmentWithAddress,
+  createTicketTypeRemoteNewFalse,
+  createTicketTypeRemoteNew,
+  createTicketError,
+  createEnrollment,
+  createTicketNew,
   createUser,
   createTicketType,
   createTicket,
@@ -140,6 +145,10 @@ describe('POST /booking', () => {
     it('no room available', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
+      const enrollment = await createEnrollment(user.id);
+      const ticketType = await createTicketTypeRemote();
+      const ticket = await createTicketNew(enrollment.id, ticketType.id);
+      const ticketIsRemote = await createTicketTypeRemoteNew();
       const hotelId = await createHotel();
       const roomId = await createRoom(hotelId.id);
       const booking_1 = await createBooking(user.id, roomId.id);
@@ -155,6 +164,10 @@ describe('POST /booking', () => {
       it('reservation made successfully', async () => {
         const user = await createUser();
         const token = await generateValidToken(user);
+        const enrollment = await createEnrollment(user.id);
+        const ticketType = await createTicketTypeRemote();
+        const ticket = await createTicketNew(enrollment.id, ticketType.id);
+        const ticketIsRemote = await createTicketTypeRemoteNew();
         const hotelId = await createHotel();
         const roomId = await createRoom(hotelId.id);
         const response = await server
@@ -175,6 +188,25 @@ describe('POST /booking', () => {
           updatedAt: consult.updatedAt.toISOString(),
         });
       });
+
+      it('reservation not made unpaid ticket', async () => {
+        const user = await createUser();
+        const token = await generateValidToken(user);
+        const enrollment = await createEnrollment(user.id);
+        const ticketType = await createTicketTypeRemote();
+        const ticket = await createTicketError(enrollment.id, ticketType.id);
+        const ticketIsRemote = await createTicketTypeRemoteNew();
+        const hotelId = await createHotel();
+        const roomId = await createRoom(hotelId.id);
+        const response = await server
+          .post('/booking')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ roomId: roomId.id });
+
+        expect(response.status).toBe(httpStatus.NOT_FOUND);
+     
+      });
+     
     });
   });
 });
@@ -244,7 +276,7 @@ describe('POST /booking', () => {
       it('update reservation made successfully', async () => {
         const user = await createUser();
         const token = await generateValidToken(user);
-        const hotelId = await createHotel();
+        const hotelId = await createHotel();        
         const roomId = await createRoom(hotelId.id);
         const updateRoomId = await createRoom(hotelId.id);
         const createBookingUser = await createBooking(user.id, roomId.id)

@@ -32,7 +32,7 @@ async function findTicketByEnrollmentId(enrollmentId: number) {
       enrollmentId,
     },
     include: {
-      TicketType: true, //inner join
+      TicketType: true, 
     }
   });
 }
@@ -55,6 +55,16 @@ async function ticketProcessPayment(ticketId: number) {
     }
   });
 }
+async function ticketProcessStatus(enrollmentId: number) {
+  return prisma.ticket.findFirst({
+    where:{
+      enrollmentId:enrollmentId
+    },
+    select: {
+     status:true
+    }
+  });
+}
 
 export type CreateTicketParams = Omit<Ticket, "id" | "createdAt" | "updatedAt">
 
@@ -65,6 +75,7 @@ const ticketRepository = {
   findTickeyById,
   findTickeWithTypeById,
   ticketProcessPayment,
+  ticketProcessStatus
 };
 
 export default ticketRepository;

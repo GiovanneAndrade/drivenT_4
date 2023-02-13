@@ -41,3 +41,30 @@ export function createhAddressWithCEP() {
     uf: "SP",
   };
 }
+
+export async function createEnrollment(userId?:number) {
+ 
+
+  return prisma.enrollment.create({
+    data: {
+      name: faker.name.findName(),
+      cpf: generateCPF(),
+      birthday: faker.date.past(),
+      phone: faker.phone.phoneNumber("(##) 9####-####"),
+      userId: userId,
+      Address: {
+        create: {
+          street: faker.address.streetName(),
+          cep: faker.address.zipCode(),
+          city: faker.address.city(),
+          neighborhood: faker.address.city(),
+          number: faker.datatype.number().toString(),
+          state: faker.helpers.arrayElement(getStates()).name,
+        },
+      },
+    },
+    include: {
+      Address: true,
+    },
+  });
+}
