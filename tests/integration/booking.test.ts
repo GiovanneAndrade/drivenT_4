@@ -241,7 +241,7 @@ describe('POST /booking', () => {
       expect(response.status).toBe(403);
     });
     describe('put /booking', () => {
-      it('reservation made successfully', async () => {
+      it('update reservation made successfully', async () => {
         const user = await createUser();
         const token = await generateValidToken(user);
         const hotelId = await createHotel();
